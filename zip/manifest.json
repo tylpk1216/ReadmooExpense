@@ -1,6 +1,6 @@
 {
     "name": "Readmoo Expense",
-    "version": "1.0",
+    "version": "1.1",
     "description": "讀墨最近 5 年每月購書金額統計",
     "manifest_version": 2,
     "background": {

@@ -33,6 +33,12 @@ function sendMessage(msg) {
     });
 }
 
+function ignoreThisRecord(item) {
+    if (item.pay_type == '犢幣') return true;
+
+    return false;
+}
+
 function getSinglePageData(page) {
     let formData = new FormData();
 
@@ -88,6 +94,8 @@ function getSinglePageData(page) {
             }
             */
             for (let i = 0; i < data.data_set_list.length; i++) {
+                if (ignoreThisRecord(data.data_set_list[i])) continue;
+
                 records.push(data.data_set_list[i]);
             }
 
