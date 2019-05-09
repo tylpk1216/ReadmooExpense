@@ -13,21 +13,33 @@ function processData(source) {
     }
 
     if (totalPage == -1 || totalPage == 0) {
-        sendMessage('no purchase records');
+        sendResultMessage('no purchase records');
         return;
     }
 
+    getSinglePageData(pageCount+1);
+
+    /*
     for (let i = 1; i <= totalPage; i++) {
         setTimeout(function() {
             let page = i;
             getSinglePageData(page);
         }, 1200);
     }
+    */
 }
 
-function sendMessage(msg) {
+function sendResultMessage(msg) {
     chrome.runtime.sendMessage({
         action: "getSource",
+        source: msg,
+        url: document.URL
+    });
+}
+
+function sendProgresstMessage(msg) {
+    chrome.runtime.sendMessage({
+        action: "progress",
         source: msg,
         url: document.URL
     });
@@ -40,6 +52,9 @@ function ignoreThisRecord(item) {
 }
 
 function getSinglePageData(page) {
+    let progressMsg = 'progress : ' + page.toString() + ' / ' + totalPage.toString();
+    sendProgresstMessage(progressMsg);
+
     let formData = new FormData();
 
     formData.append('order_by_type', "desc");
@@ -54,7 +69,7 @@ function getSinglePageData(page) {
         contentType: false,
         success: function(data, result) {
             if (!data || !data.data_set_list) {
-                sendMessage('readmoo responses no data');
+                sendResultMessage('readmoo responses no data');
                 return;
             }
 
@@ -101,11 +116,14 @@ function getSinglePageData(page) {
 
             pageCount++;
             if (pageCount == totalPage) {
-                sendMessage(records);
+                sendResultMessage(records);
+                return;
             }
+
+            getSinglePageData(pageCount+1);
         },
         error: function(xhr, textStatus, message) {
-            sendMessage(message);
+            sendResultMessage(message);
         }
     });
 }

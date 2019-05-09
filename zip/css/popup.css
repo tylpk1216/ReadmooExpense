@@ -27,6 +27,12 @@
     margin-right: auto;
 }
 
+#progressbar
+{
+    text-align: center;
+    margin: 15px auto;
+}
+
 .month, .centerData
 {
     text-align: center;

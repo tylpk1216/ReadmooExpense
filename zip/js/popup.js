@@ -1,13 +1,16 @@
 const messageID = '#message';
 const loadingImgID = '#loading';
+const progressBarID = '#progressbar';
 const reportID = '#report';
 
 let $messagePanel = null;
 let $loadingImg = null;
+let $progressBar = null;
 let $reportTable = null;
 
 function showMessage(msg) {
     disableLoadingImg(true);
+    $progressBar.text('');
     $messagePanel.text(msg);
 }
 
@@ -26,6 +29,7 @@ function clearTableRows() {
 function getPageHTML() {
     showMessage('');
     disableLoadingImg(false);
+    $progressBar.text('');
     clearTableRows();
 
     chrome.tabs.executeScript(null, {
@@ -50,6 +54,7 @@ function getPageHTML() {
 function onWindowLoad() {
     $messagePanel = $(messageID);
     $loadingImg = $(loadingImgID);
+    $progressBar = $(progressBarID);
     $reportTable = $(reportID);
 
     getPageHTML();
@@ -139,6 +144,7 @@ function processReport(items) {
     renderReportTable(monthObj);
 
     disableLoadingImg(true);
+    $progressBar.text('');
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender) {
@@ -148,6 +154,8 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
         } else {
             showMessage(request.source);
         }
+    } else if (request.action == "progress") {
+        $progressBar.text(request.source);
     }
 });
 
