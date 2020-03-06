@@ -4,7 +4,7 @@ var records = [];
 
 function processData(source) {
     pageCount = 0;
-    totalPage = -1;
+    totalPage = 1;
     records = [];
 
     let regex = /<select class=\"pagination-jump\"><option.*>(\d)<\/option><\/select>/g;
@@ -12,10 +12,13 @@ function processData(source) {
         totalPage = parseInt(info[1]);
     }
 
+    // always do one time query.
+    /*
     if (totalPage == -1 || totalPage == 0) {
         sendResultMessage('no purchase records');
         return;
     }
+    */
 
     getSinglePageData(pageCount+1);
 
@@ -46,7 +49,9 @@ function sendProgresstMessage(msg) {
 }
 
 function ignoreThisRecord(item) {
-    if (item.pay_type == '犢幣') return true;
+    if (g_ignored) {
+        if (item.pay_type == '犢幣') return true;
+    }
 
     return false;
 }

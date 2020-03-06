@@ -26,7 +26,7 @@ function clearTableRows() {
     $('tr').remove();
 }
 
-function getPageHTML() {
+function getPageHTML(ignored) {
     showMessage('');
     disableLoadingImg(false);
     $progressBar.text('');
@@ -41,11 +41,20 @@ function getPageHTML() {
         }
 
         chrome.tabs.executeScript(null, {
-            file: "js/gethtml.js"
+            code: "var g_ignored = " + ignored + ";"
         }, function() {
             if (chrome.runtime.lastError) {
                 let errorMsg = chrome.runtime.lastError.message;
                 showMessage('error : \n' + errorMsg);
+            } else {
+                chrome.tabs.executeScript(null, {
+                    file: "js/gethtml.js"
+                }, function() {
+                    if (chrome.runtime.lastError) {
+                        let errorMsg = chrome.runtime.lastError.message;
+                        showMessage('error : \n' + errorMsg);
+                    }
+                });
             }
         });
     });
@@ -57,7 +66,11 @@ function onWindowLoad() {
     $progressBar = $(progressBarID);
     $reportTable = $(reportID);
 
-    getPageHTML();
+    chrome.storage.sync.get({
+        ignored: true
+    }, function(items) {
+        getPageHTML(items.ignored);
+    });
 }
 
 function getFormatExpense(expense) {
