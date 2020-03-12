@@ -2,6 +2,8 @@ var pageCount = 0;
 var totalPage = -1;
 var records = [];
 
+var ignoredRule = true;
+
 function processData(source) {
     pageCount = 0;
     totalPage = 1;
@@ -20,16 +22,12 @@ function processData(source) {
     }
     */
 
-    getSinglePageData(pageCount+1);
-
-    /*
-    for (let i = 1; i <= totalPage; i++) {
-        setTimeout(function() {
-            let page = i;
-            getSinglePageData(page);
-        }, 1200);
-    }
-    */
+    chrome.storage.sync.get({
+        ignored: true
+    }, function(items) {
+        ignoredRule = items.ignored;
+        getSinglePageData(pageCount+1);
+    });
 }
 
 function sendResultMessage(msg) {
@@ -49,7 +47,7 @@ function sendProgresstMessage(msg) {
 }
 
 function ignoreThisRecord(item) {
-    if (g_ignored) {
+    if (ignoredRule) {
         if (item.pay_type == '犢幣') return true;
     }
 
