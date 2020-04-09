@@ -9,10 +9,12 @@ function processData(source) {
     totalPage = 1;
     records = [];
 
-    let regex = /<select class=\"pagination-jump\"><option.*>(\d)<\/option><\/select>/g;
+    let regex = /<select class=\"pagination-jump\"><option.*>(\d*)<\/option><\/select>/g;
     while((info = regex.exec(source)) != null) {
         totalPage = parseInt(info[1]);
+        console.log('in regex loop', totalPage);
     }
+    console.log('final', totalPage);
 
     // always do one time query.
     /*
