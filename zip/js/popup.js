@@ -8,6 +8,8 @@ let $loadingImg = null;
 let $progressBar = null;
 let $reportTable = null;
 
+let tabID;
+
 function showMessage(msg) {
     disableLoadingImg(true);
     $progressBar.text('');
@@ -32,32 +34,52 @@ function getPageHTML() {
     $progressBar.text('');
     clearTableRows();
 
-    chrome.tabs.executeScript(null, {
-        file: "js/jquery.min.js"
-    }, function() {
-        if (chrome.runtime.lastError) {
-            let errorMsg = chrome.runtime.lastError.message;
-            showMessage('error : \n' + errorMsg);
-        }
-
-        chrome.tabs.executeScript(null, {
-            file: "js/gethtml.js"
-        }, function() {
+    chrome.scripting.executeScript(
+        {
+            target: {tabId: tabID},
+            files: ['js/gethtml.js']
+        },
+        function() {
             if (chrome.runtime.lastError) {
                 let errorMsg = chrome.runtime.lastError.message;
                 showMessage('error : \n' + errorMsg);
             }
-        });
-    });
+        }
+    );
+}
+
+async function getCurrentTabID() {
+    let queryOptions = { active: true, currentWindow: true };
+    let [tab] = await chrome.tabs.query(queryOptions);
+    return tab.id;
+}
+
+async function start() {
+    tabID = await getCurrentTabID();
+    chrome.scripting.executeScript(
+        {
+            target: {tabId: tabID},
+            files: ['js/jquery.min.js']
+        },
+        function() {
+            if (chrome.runtime.lastError) {
+                let errorMsg = chrome.runtime.lastError.message;
+                console.log('error : \n' + errorMsg);
+                return;
+            }
+
+            $messagePanel = $(messageID);
+            $loadingImg = $(loadingImgID);
+            $progressBar = $(progressBarID);
+            $reportTable = $(reportID);
+
+            getPageHTML();
+        }
+    );
 }
 
 function onWindowLoad() {
-    $messagePanel = $(messageID);
-    $loadingImg = $(loadingImgID);
-    $progressBar = $(progressBarID);
-    $reportTable = $(reportID);
-
-    getPageHTML();
+    start();
 }
 
 function getFormatExpense(expense) {
@@ -147,7 +169,7 @@ function processReport(items) {
     $progressBar.text('');
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action == "getSource") {
         if (Array.isArray(request.source)) {
             processReport(request.source);
@@ -157,6 +179,7 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
     } else if (request.action == "progress") {
         $progressBar.text(request.source);
     }
+    sendResponse();
 });
 
 window.onload = onWindowLoad;

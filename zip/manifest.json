@@ -1,16 +1,13 @@
 {
     "name": "Readmoo Expense",
-    "version": "1.3",
+    "version": "1.4",
     "description": "讀墨最近 5 年每月購書金額統計",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "background": {
-        "scripts": [
-            "js/background.js"
-        ],
-        "persistent": false
+        "service_worker": "js/background.js"
     },
-    "permissions": ["declarativeContent", "activeTab", "storage"],
-    "page_action": {
+    "permissions": ["declarativeContent", "activeTab", "storage", "scripting"],
+    "action": {
         "default_popup": "html/popup.html",
         "default_icon": {
             "16": "images/img16.png",
@@ -26,7 +23,6 @@
         "128": "images/img128.png"
     },
     "options_ui": {
-        "page": "html/option.html",
-        "chrome_style": true
+        "page": "html/option.html"
     }
 }

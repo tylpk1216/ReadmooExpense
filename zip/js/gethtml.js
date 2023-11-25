@@ -6,23 +6,21 @@ var ignoredRule = true;
 
 function processData(source) {
     pageCount = 0;
-    totalPage = 1;
+    totalPage = -1;
     records = [];
-
-    let regex = /<select class=\"pagination-jump\"><option.*>(\d*)<\/option><\/select>/g;
+    
+    //<a class="page-link" role="button" href="#">21</a>
+    let regex = /<a class=\"page-link\" role=\"button\" href=\"#\">(\d*)<\/a>/g;
     while((info = regex.exec(source)) != null) {
         totalPage = parseInt(info[1]);
         console.log('in regex loop', totalPage);
     }
     console.log('final', totalPage);
 
-    // always do one time query.
-    /*
     if (totalPage == -1 || totalPage == 0) {
-        sendResultMessage('no purchase records');
+        sendResultMessage('Readmoo HTML changed');
         return;
     }
-    */
 
     chrome.storage.sync.get({
         ignored: true
